@@ -1040,3 +1040,14 @@ button.chip:hover {
   color: var(--text);
   outline: none;
 }
+
+.chip--kind {
+  border-color: var(--border-accent);
+  color: var(--kicker);
+  cursor: help;
+}
+
+.legend-list strong {
+  color: var(--text);
+  font-weight: 600;
+}

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { Cluster, Constellation, StarBody } from '../galaxy/constellation';
 import type { Pickable, View } from './stage';
+import { StarModels } from './star-models';
 import { glowTexture, ringTexture } from './textures';
 
 export interface StarPickable extends Pickable {
@@ -17,7 +18,7 @@ export class ConstellationView implements View {
   private readonly always: Pickable[];
   private readonly disposables: { dispose(): void }[] = [];
   private filter: ((star: StarBody) => boolean) | null = null;
-  private readonly mesh: THREE.InstancedMesh;
+  readonly models: StarModels;
   private readonly halos: THREE.Sprite[] = [];
   private spinning = true;
   private readonly marker = new THREE.Sprite(
@@ -34,18 +35,11 @@ export class ConstellationView implements View {
     this.disposables.push(this.marker.material);
     this.spin.add(this.marker);
 
-    const geometry = new THREE.SphereGeometry(1, 20, 14);
-    const material = new THREE.MeshBasicMaterial({ toneMapped: false });
-    this.mesh = new THREE.InstancedMesh(geometry, material, Math.max(1, stars.length));
-    this.mesh.count = stars.length;
-    this.disposables.push(geometry, material);
-    this.spin.add(this.mesh);
+    this.models = new StarModels(stars);
+    this.disposables.push(this.models);
+    this.spin.add(this.models.group);
 
-    const color = new THREE.Color();
     stars.forEach((star, i) => {
-      this.mesh.setMatrixAt(i, this.matrixFor(star, 1));
-      // Push bright stars above 1.0 so the bloom pass picks them up.
-      this.mesh.setColorAt(i, color.set(star.color).multiplyScalar(0.45 + star.brightness * 1.9));
       const halo = new THREE.Sprite(
         new THREE.SpriteMaterial({
           map: glowTexture(),
@@ -53,7 +47,7 @@ export class ConstellationView implements View {
           transparent: true,
           depthWrite: false,
           blending: THREE.AdditiveBlending,
-          opacity: this.haloOpacity(star),
+          opacity: this.haloOpacity(i),
         }),
       );
       halo.position.set(star.position.x, star.position.y, star.position.z);
@@ -62,8 +56,6 @@ export class ConstellationView implements View {
       this.disposables.push(halo.material);
       this.spin.add(halo);
     });
-    this.mesh.instanceMatrix.needsUpdate = true;
-    if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true;
 
     for (const cluster of clusters) this.addNebula(cluster);
     this.addLinks();
@@ -117,17 +109,13 @@ export class ConstellationView implements View {
   }
 
   private applyVisibility() {
-    const color = new THREE.Color();
     this.constellation.stars.forEach((star, i) => {
       const matches = !this.filter || this.filter(star);
       const focused = this.focus === null || star.cluster === this.focus;
       const on = matches && focused;
-      this.mesh.setMatrixAt(i, this.matrixFor(star, on ? 1 : 0.5));
-      this.mesh.setColorAt(i, color.set(star.color).multiplyScalar(on ? 0.45 + star.brightness * 1.9 : 0.18));
-      this.halos[i]!.material.opacity = on ? this.haloOpacity(star) : 0.02;
+      this.models.setDim(i, !on);
+      this.halos[i]!.material.opacity = on ? this.haloOpacity(i) : 0.02;
     });
-    this.mesh.instanceMatrix.needsUpdate = true;
-    if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true;
     this.linkMaterial?.setValues({ opacity: this.focus === null ? 0.32 : 0.1 });
     this.focusLinks?.removeFromParent();
     this.focusLinks = null;
@@ -188,6 +176,7 @@ export class ConstellationView implements View {
 
   update(dt: number, elapsed: number) {
     if (this.spinning) this.spin.rotation.y += dt * 0.008;
+    this.models.update(elapsed);
     if (this.marker.visible) this.marker.scale.setScalar(this.markerRadius * (3.4 + Math.sin(elapsed * 3) * 0.35) + 2);
   }
 
@@ -195,16 +184,12 @@ export class ConstellationView implements View {
     for (const item of this.disposables) item.dispose();
   }
 
-  private haloOpacity(star: StarBody) {
-    return 0.12 + star.brightness * 0.35 + star.glow * 0.25;
-  }
-
-  private matrixFor(star: StarBody, scale: number) {
-    return new THREE.Matrix4().compose(
-      new THREE.Vector3(star.position.x, star.position.y, star.position.z),
-      new THREE.Quaternion(),
-      new THREE.Vector3().setScalar(star.radius * scale),
-    );
+  private haloOpacity(index: number) {
+    const star = this.constellation.stars[index]!;
+    const opacity = 0.12 + star.brightness * 0.35 + star.glow * 0.25;
+    // Rocks and crystals don't shine much on their own.
+    const kind = this.models.kinds[index];
+    return kind === 'asteroid' || kind === 'remnant' ? opacity * 0.35 : opacity;
   }
 
   /** A faint cloud of the constellation's colour, so each one reads as a group. */

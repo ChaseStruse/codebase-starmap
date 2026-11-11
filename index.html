@@ -100,10 +100,19 @@
         <h2>Reading the map</h2>
         <dl class="legend-list">
           <dt>Star</dt><dd>A repository. Colour is its main language, size is its size, brightness is how recently it was pushed, and the halo grows with stars.</dd>
+          <dt>Star types</dt>
+          <dd>
+            <strong>Active star</strong> (boiling surface): pushed in the last 30 days.
+            <strong>Pulsar</strong> (sweeping beams): 5+ stargazers.
+            <strong>Ringed giant</strong>: 5 MB+.
+            <strong>Binary</strong> (two orbiting stars): a fork.
+            <strong>Remnant</strong> (crystal): archived.
+            <strong>Asteroid</strong> (tumbling rock): a tiny repo.
+          </dd>
           <dt>Constellation</dt><dd>All repos in one language, floating in their own patch of sky. The oldest repo sits at its centre and newer ones form shells around it.</dd>
           <dt>Lines</dt><dd>Each repo linked to its nearest older neighbour in the same constellation.</dd>
-          <dt>Planet</dt><dd>A top-level folder. Size is the bytes inside it; colour is its main language.</dd>
-          <dt>Moon</dt><dd>A file, coloured by language. Files at the repo root form the belt around the star.</dd>
+          <dt>Planet</dt><dd>A top-level folder. Size is the bytes inside it; colour is its main language. Big folders are gas giants (ringed if they have several sub-folders), tests are ice worlds, CI folders like .github are space stations, and the rest are rocky planets.</dd>
+          <dt>Moon</dt><dd>A file, as a little rock coloured by language. Files at the repo root form the belt around the star.</dd>
           <dt>Flares</dt><dd>Commit activity. Scrub the timeline to watch a year of work.</dd>
           <dt>Trade lanes</dt><dd>Imports between folders, scanned on demand when you pick a planet.</dd>
         </dl>

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { Cluster, Constellation, StarBody } from './galaxy/constellation';
 import type { ConstellationView } from './scene/constellation-view';
 import type { Stage } from './scene/stage';
+import { STAR_KINDS, starKind } from './galaxy/kinds';
 import { compact, el, extLink, formatBytes, formatNumber, timeAgo } from './ui/dom';
 
 export type StarStep = {
@@ -307,6 +308,7 @@ export class Tour {
       el(
         'div',
         { class: 'chips' },
+        el('span', { class: 'chip chip--kind', title: STAR_KINDS[starKind(step.star)].meaning }, `✦ ${STAR_KINDS[starKind(step.star)].label}`),
         el('span', { class: 'chip' }, `★ ${formatNumber(r.stargazers_count)}`),
         el('span', { class: 'chip' }, `⑂ ${formatNumber(r.forks_count)}`),
         el('span', { class: 'chip' }, formatBytes(r.size * 1024)),

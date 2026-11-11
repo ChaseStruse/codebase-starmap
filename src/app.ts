@@ -9,6 +9,7 @@ import type { GhRepo, GhWeek } from './github/types';
 import { ConstellationView, type StarPickable } from './scene/constellation-view';
 import { reducedMotion, type Pickable, Stage } from './scene/stage';
 import { SystemView, type SystemPickable } from './scene/system-view';
+import { PLANET_KINDS, planetKind, STAR_KINDS, starKind } from './galaxy/kinds';
 import { Tour } from './tour';
 import { byId, compact, el, extLink, formatBytes, formatNumber, timeAgo } from './ui/dom';
 
@@ -33,6 +34,10 @@ function saveToken(token: string | null) {
 }
 
 type Mode = 'landing' | 'constellation' | 'system';
+
+/** A chip naming what kind of body this is; hover explains why. */
+export const kindChip = (kind: { label: string; meaning: string }) =>
+  el('span', { class: 'chip chip--kind', title: kind.meaning }, `✦ ${kind.label}`);
 
 /** Wires GitHub data, the 3D stage and the HTML panels together. */
 export class App {
@@ -585,6 +590,7 @@ export class App {
         'div',
         { class: 'chips' },
         r.language ? el('span', { class: 'chip' }, el('span', { class: 'swatch', style: `background:${star.color}` }), r.language) : null,
+        kindChip(STAR_KINDS[starKind(star)]),
         el('span', { class: 'chip' }, `★ ${formatNumber(r.stargazers_count)}`),
         el('span', { class: 'chip' }, `⑂ ${formatNumber(r.forks_count)}`),
         el('span', { class: 'chip' }, formatBytes(r.size * 1024)),
@@ -650,6 +656,7 @@ export class App {
         'div',
         { class: 'chips' },
         planet.language ? el('span', { class: 'chip' }, el('span', { class: 'swatch', style: `background:${planet.color}` }), planet.language) : null,
+        kindChip(PLANET_KINDS[planetKind(planet)]),
         el('span', { class: 'chip' }, `${formatNumber(planet.fileCount)} files`),
         el('span', { class: 'chip' }, formatBytes(planet.bytes)),
       ),
