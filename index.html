@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Codebase Starmap</title>
+    <meta name="description" content="Enter a GitHub username and fly through their repositories as a 3D constellation." />
+    <meta name="theme-color" content="#040f0b" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='6' fill='%2320d99a'/%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%237fe3bd' stroke-width='1.5' opacity='.6'/%3E%3Ccircle cx='27' cy='12' r='2' fill='%23f2f5f4'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&family=Manrope:wght@600;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <canvas id="scene" aria-label="3D star map of GitHub repositories"></canvas>
+    <div id="labels" class="labels" aria-hidden="true"></div>
+    <div id="tooltip" class="tooltip" hidden></div>
+
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Codebase Starmap home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">Codebase Starmap</span>
+      </a>
+      <nav id="crumbs" class="crumbs" aria-label="Location"></nav>
+      <form id="search" class="search" role="search" hidden>
+        <label class="sr-only" for="search-input">GitHub username</label>
+        <input id="search-input" name="user" placeholder="GitHub username" autocomplete="off" spellcheck="false" maxlength="39" />
+        <button type="submit">Map</button>
+      </form>
+      <button id="rate" class="rate" type="button" title="GitHub API requests left this hour" hidden></button>
+      <button id="legend-btn" class="icon-btn" type="button" aria-label="What am I looking at?">?</button>
+      <button id="settings-btn" class="icon-btn" type="button" aria-label="Settings">⚙</button>
+    </header>
+
+    <section id="landing" class="landing">
+      <p class="kicker">Solar Forge</p>
+      <h1>Your GitHub, as a galaxy.</h1>
+      <p class="lede">
+        Every repository becomes a star. Fly into one and its folders orbit as planets, its files as moons, and a
+        year of commits flares across its surface.
+      </p>
+      <form id="landing-form" class="landing-form">
+        <label class="sr-only" for="landing-input">GitHub username</label>
+        <span class="at" aria-hidden="true">@</span>
+        <input id="landing-input" name="user" placeholder="github username" autocomplete="off" spellcheck="false" maxlength="39" required />
+        <button type="submit">Map it</button>
+      </form>
+      <p class="examples">
+        Try <button type="button" data-user="ChaseStruse">ChaseStruse</button>
+        <button type="button" data-user="sindresorhus">sindresorhus</button>
+        <button type="button" data-user="torvalds">torvalds</button>
+      </p>
+      <p class="fine">Public GitHub data only. No sign-in, and nothing leaves your browser except requests to GitHub.</p>
+    </section>
+
+    <aside id="panel" class="panel" hidden></aside>
+    <section id="timeline" class="timeline" aria-label="Commit activity" hidden></section>
+    <section id="tour" class="tour" aria-label="Guided tour" aria-live="polite" hidden></section>
+
+    <div id="loading" class="loading" hidden>
+      <div class="orbit-spinner" aria-hidden="true"><span></span></div>
+      <p id="loading-text">Loading…</p>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <div id="nogl" class="nogl" hidden>
+      <h2>WebGL is not available</h2>
+      <p>Codebase Starmap needs WebGL to draw the galaxy. Try another browser, or turn on hardware acceleration.</p>
+    </div>
+
+    <dialog id="settings" class="dialog">
+      <form method="dialog" class="dialog-body" id="settings-form">
+        <h2>Settings</h2>
+        <h3>GitHub token <span class="muted">(optional)</span></h3>
+        <p>
+          Without a token GitHub allows 60 requests an hour from your network, which is about 25 repo fly-ins. A
+          token raises that to 5,000.
+        </p>
+        <p>
+          Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">fine-grained token</a>
+          with <strong>public repositories (read-only)</strong> access and no other permissions.
+        </p>
+        <p class="muted">It is saved only in this browser and sent only to api.github.com.</p>
+        <label for="token-input" class="sr-only">GitHub token</label>
+        <input id="token-input" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…" />
+        <p id="token-status" class="muted"></p>
+        <div class="dialog-actions">
+          <button type="button" id="token-clear" class="ghost">Remove token</button>
+          <button type="button" id="cache-clear" class="ghost">Clear cache</button>
+          <button type="submit" value="close" class="ghost">Close</button>
+          <button type="button" id="token-save">Save token</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="legend" class="dialog">
+      <form method="dialog" class="dialog-body">
+        <h2>Reading the map</h2>
+        <dl class="legend-list">
+          <dt>Star</dt><dd>A repository. Colour is its main language, size is its size, brightness is how recently it was pushed, and the halo grows with stars.</dd>
+          <dt>Star types</dt>
+          <dd>
+            <strong>Active star</strong> (boiling surface): pushed in the last 30 days.
+            <strong>Pulsar</strong> (sweeping beams): 5+ stargazers.
+            <strong>Ringed giant</strong>: 5 MB+.
+            <strong>Binary</strong> (two orbiting stars): a fork.
+            <strong>Remnant</strong> (crystal): archived.
+            <strong>Asteroid</strong> (tumbling rock): a tiny repo.
+          </dd>
+          <dt>Constellation</dt><dd>All repos in one language, floating in their own patch of sky. The oldest repo sits at its centre and newer ones form shells around it.</dd>
+          <dt>Lines</dt><dd>Each repo linked to its nearest older neighbour in the same constellation.</dd>
+          <dt>Planet</dt><dd>A top-level folder. Size is the bytes inside it; colour is its main language. Big folders are gas giants (ringed if they have several sub-folders), tests are ice worlds, CI folders like .github are space stations, and the rest are rocky planets.</dd>
+          <dt>Moon</dt><dd>A file, as a little rock coloured by language. Files at the repo root form the belt around the star.</dd>
+          <dt>Flares</dt><dd>Commit activity. Scrub the timeline to watch a year of work.</dd>
+          <dt>Trade lanes</dt><dd>Imports between folders, scanned on demand when you pick a planet.</dd>
+        </dl>
+        <p class="muted">Drag to orbit, scroll or pinch to zoom, right-drag to pan. Double-click a star to fly in; Esc to go back. On the tour: Space or → goes to the next stop, ← goes back, Esc ends it. Pick Manual or an auto-advance time on the tour card.</p>
+        <div class="dialog-actions"><button type="submit">Got it</button></div>
+      </form>
+    </dialog>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
