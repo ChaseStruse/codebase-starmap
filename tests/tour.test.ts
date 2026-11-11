@@ -17,10 +17,18 @@ const c = buildConstellation(
 );
 
 describe('tourSteps', () => {
-  it('visits each constellation, then its stars oldest first', () => {
-    expect(tourSteps(c).map((s) => (s.kind === 'cluster' ? `[${s.cluster.name}]` : s.star.repo.name))).toEqual([
-      '[TypeScript]', 'seed', 'famous', 'busy', 'fresh', '[Rust]', 'lonely',
-    ]);
+  const names = (steps: ReturnType<typeof tourSteps>) =>
+    steps.map((s) => (s.kind === 'cluster' ? `[${s.cluster.name}]` : s.star.repo.name));
+
+  it('visits each constellation, then its top repos: most stars, then most recently active', () => {
+    expect(names(tourSteps(c))).toEqual(['[TypeScript]', 'famous', 'busy', 'fresh', 'seed', '[Rust]', 'lonely']);
+  });
+
+  it('caps the stars visited per constellation', () => {
+    const steps = tourSteps(c, 2);
+    expect(names(steps)).toEqual(['[TypeScript]', 'famous', 'busy', '[Rust]', 'lonely']);
+    const first = steps[1]!;
+    expect(first.kind === 'star' && [first.rank, first.shown]).toEqual([0, 2]);
   });
 });
 

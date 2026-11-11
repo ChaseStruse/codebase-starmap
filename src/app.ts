@@ -77,7 +77,7 @@ export class App {
       const typing = event.target instanceof HTMLInputElement;
       if (this.tour?.active && !typing) {
         const actions: Record<string, () => void> = {
-          ' ': () => this.tour!.togglePause(),
+          ' ': () => this.tour!.next(),
           ArrowRight: () => this.tour!.next(),
           ArrowLeft: () => this.tour!.prev(),
           Escape: () => this.tour!.stop(),

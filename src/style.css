@@ -1002,3 +1002,41 @@ button.chip:hover {
     font-size: 19px;
   }
 }
+
+.tour-timer {
+  position: absolute;
+  inset: 3px 0 auto 0;
+  height: 2px;
+  width: 0;
+  background: rgba(93, 255, 192, 0.55);
+}
+
+@keyframes tour-timer {
+  to {
+    width: 100%;
+  }
+}
+
+.tour-btn--main {
+  width: auto;
+  padding: 0 16px;
+  font-weight: 600;
+}
+
+.tour-auto {
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-dark);
+  color: var(--text-2);
+  font: 500 12px var(--font-mono);
+  cursor: pointer;
+}
+
+.tour-auto:hover,
+.tour-auto:focus {
+  border-color: var(--border-accent);
+  color: var(--text);
+  outline: none;
+}
