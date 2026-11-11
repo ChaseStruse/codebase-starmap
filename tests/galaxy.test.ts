@@ -20,13 +20,38 @@ describe('buildConstellation', () => {
     expect(a.stars.map((s) => s.position)).toEqual(b.stars.map((s) => s.position));
   });
 
-  it('places older repos nearer the core', () => {
-    const { stars } = buildConstellation(user, repos, NOW);
-    const distance = (name: string) => {
-      const p = stars.find((s) => s.repo.name === name)!.position;
-      return Math.hypot(p.x, p.z);
-    };
-    expect(distance('old')).toBeLessThan(distance('new'));
+  it('puts the oldest repo at the centre of its constellation', () => {
+    const c = buildConstellation(user, repos, NOW);
+    const ts = c.clusters.find((cl) => cl.language === 'TypeScript')!;
+    expect(c.stars[ts.stars[0]!]!.repo.name).toBe('old');
+    expect(c.stars[ts.stars[0]!]!.position).toEqual(ts.center);
+  });
+
+  it('groups one constellation per language, largest first', () => {
+    const c = buildConstellation(user, [...repos, repo('docs', { language: null })], NOW);
+    expect(c.clusters.map((cl) => [cl.name, cl.stars.length])).toEqual([
+      ['TypeScript', 3],
+      ['Rust', 1],
+      ['Uncharted', 1],
+    ]);
+    expect(c.stars.every((s) => c.clusters[s.cluster]!.stars.includes(c.stars.indexOf(s)))).toBe(true);
+  });
+
+  it('spreads constellations through 3D space without overlapping', () => {
+    const many = ['TypeScript', 'Python', 'Rust', 'Go', 'C#', 'Java', 'Lua', 'Swift', 'C++', 'HTML'].flatMap((language, l) =>
+      Array.from({ length: 12 }, (_, i) =>
+        repo(`${language}-${i}`, { language, created_at: `20${10 + l}-01-${String(i + 1).padStart(2, '0')}T00:00:00Z` }),
+      ),
+    );
+    const { clusters, stars } = buildConstellation(user, many, NOW);
+    for (let a = 0; a < clusters.length; a++)
+      for (let b = a + 1; b < clusters.length; b++) {
+        const p = clusters[a]!.center;
+        const q = clusters[b]!.center;
+        expect(Math.hypot(p.x - q.x, p.y - q.y, p.z - q.z)).toBeGreaterThan(clusters[a]!.radius + clusters[b]!.radius);
+      }
+    const ys = stars.map((s) => s.position.y);
+    expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThan(100);
   });
 
   it('keeps existing stars in place when a new repo appears', () => {
@@ -43,9 +68,10 @@ describe('buildConstellation', () => {
     expect(byName.mid!.brightness).toBeLessThan(byName.mid2!.brightness);
   });
 
-  it('links same-language repos in creation order and counts languages', () => {
+  it('links stars within their constellation and counts languages', () => {
     const c = buildConstellation(user, repos, NOW);
-    expect(c.links).toHaveLength(2); // old→mid→mid2 (TypeScript); Rust alone
+    expect(c.links).toHaveLength(2); // TypeScript: old, mid, mid2; Rust alone
+    expect(c.links.every((l) => c.stars[l.from]!.cluster === c.stars[l.to]!.cluster)).toBe(true);
     expect(c.languages[0]).toEqual(['TypeScript', 3]);
   });
 

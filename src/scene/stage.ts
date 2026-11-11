@@ -11,6 +11,8 @@ export interface Pickable {
   id: string;
   label: string;
   radius: number;
+  /** A constellation name rather than a body: larger label, never picked. */
+  heading?: boolean;
   worldPosition(target: THREE.Vector3): THREE.Vector3;
 }
 
@@ -191,15 +193,14 @@ export class Stage {
         this.labels.delete(id);
       }
     const placed: { x0: number; x1: number; y0: number; y1: number }[] = [];
-    const ordered = [...wanted.values()].sort(
-      (a, b) => Number(this.highlighted.has(b.id)) - Number(this.highlighted.has(a.id)),
-    );
+    const rank = (body: Pickable) => (this.highlighted.has(body.id) ? 2 : body.heading ? 1 : 0);
+    const ordered = [...wanted.values()].sort((a, b) => rank(b) - rank(a));
     for (const body of ordered) {
       const id = body.id;
       let element = this.labels.get(id);
       if (!element) {
         element = document.createElement('div');
-        element.className = 'label';
+        element.className = body.heading ? 'label label--heading' : 'label';
         element.textContent = body.label;
         this.labelLayer.append(element);
         this.labels.set(id, element);
@@ -209,9 +210,9 @@ export class Stage {
         element.hidden = true;
         continue;
       }
-      const top = screen.y + Math.max(8, screen.radius) + 4;
-      const half = (body.label.length * 7.2) / 2 + 4;
-      const box = { x0: screen.x - half, x1: screen.x + half, y0: top, y1: top + 14 };
+      const top = body.heading ? screen.y - 10 : screen.y + Math.max(8, screen.radius) + 4;
+      const half = (body.label.length * (body.heading ? 9.5 : 7.2)) / 2 + 4;
+      const box = { x0: screen.x - half, x1: screen.x + half, y0: top, y1: top + (body.heading ? 20 : 14) };
       const hot = this.highlighted.has(id);
       if (!hot && placed.some((p) => box.x0 < p.x1 && box.x1 > p.x0 && box.y0 < p.y1 && box.y1 > p.y0)) {
         element.hidden = true;

@@ -6,9 +6,10 @@ import { buildSystem, type PlanetBody, type SystemModel } from './galaxy/system'
 import { GitHubError, NotFoundError, RateLimitError, type GitHubClient, type RateLimit } from './github/client';
 import type { CacheStore } from './github/cache';
 import type { GhRepo, GhWeek } from './github/types';
-import { ConstellationView } from './scene/constellation-view';
+import { ConstellationView, type StarPickable } from './scene/constellation-view';
 import { reducedMotion, type Pickable, Stage } from './scene/stage';
 import { SystemView, type SystemPickable } from './scene/system-view';
+import { Tour } from './tour';
 import { byId, compact, el, extLink, formatBytes, formatNumber, timeAgo } from './ui/dom';
 
 const TOKEN_KEY = 'starmap.token';
@@ -54,6 +55,7 @@ export class App {
   /** Bumped on every navigation so slow responses for an old view are ignored. */
   private seq = 0;
   private lastClick = { id: '', at: 0 };
+  private tour: Tour | null = null;
 
   private readonly panel = byId('panel');
   private readonly timeline = byId('timeline');
@@ -71,7 +73,23 @@ export class App {
     this.client.onRateChange((rate) => this.renderRate(rate));
     addEventListener('popstate', () => void this.route());
     addEventListener('keydown', (event) => {
-      if (event.key !== 'Escape' || document.querySelector('dialog[open]')) return;
+      if (document.querySelector('dialog[open]')) return;
+      const typing = event.target instanceof HTMLInputElement;
+      if (this.tour?.active && !typing) {
+        const actions: Record<string, () => void> = {
+          ' ': () => this.tour!.togglePause(),
+          ArrowRight: () => this.tour!.next(),
+          ArrowLeft: () => this.tour!.prev(),
+          Escape: () => this.tour!.stop(),
+        };
+        const action = actions[event.key];
+        if (action) {
+          event.preventDefault();
+          action();
+        }
+        return;
+      }
+      if (event.key !== 'Escape') return;
       if (this.selected) this.select(null);
       else if (this.mode === 'system') void this.leaveSystem();
     });
@@ -97,6 +115,7 @@ export class App {
   // ---------------------------------------------------------------- navigation
 
   private showLanding() {
+    this.tour?.stop(false);
     this.seq++;
     this.mode = 'landing';
     byId('landing').hidden = false;
@@ -141,6 +160,7 @@ export class App {
 
   private showConstellation(restoreCamera = false) {
     const constellation = this.constellation!;
+    this.tour?.stop(false);
     this.stopPlayback();
     this.mode = 'constellation';
     this.system = null;
@@ -149,11 +169,13 @@ export class App {
     this.timeline.hidden = true;
     const view = new ConstellationView(constellation);
     this.constellationView = view;
-    const extent = Math.max(60, ...constellation.stars.map((s) => Math.hypot(s.position.x, s.position.z)));
+    const extent = Math.max(60, ...constellation.stars.map((s) => Math.hypot(s.position.x, s.position.y, s.position.z)));
     this.stage.controls.maxDistance = extent * 5;
     this.stage.setView(
       view,
-      restoreCamera && this.savedCamera ? this.savedCamera.position : new THREE.Vector3(0, extent * 0.95, extent * 1.8),
+      restoreCamera && this.savedCamera
+        ? this.savedCamera.position
+        : new THREE.Vector3(0, 0.38, 1).normalize().multiplyScalar(extent * 1.6),
       restoreCamera && this.savedCamera ? this.savedCamera.target : new THREE.Vector3(),
     );
     this.applyFilter();
@@ -162,6 +184,7 @@ export class App {
   }
 
   private async enterSystem(star: StarBody, push = true) {
+    this.tour?.stop(false);
     const seq = ++this.seq;
     const repo = star.repo;
     this.stopPlayback();
@@ -308,8 +331,24 @@ export class App {
 
   // ---------------------------------------------------------------- selection + input
 
+  private startTour() {
+    if (!this.constellation || !this.constellationView) return;
+    this.select(null);
+    this.tour = new Tour(this.stage, this.constellationView, this.constellation, byId('tour'), {
+      enter: (star) => void this.enterSystem(star),
+      ended: () => {
+        this.tour = null;
+        this.renderPanel();
+      },
+    });
+    this.tour.start();
+    this.renderPanel();
+  }
+
   private select(body: Pickable | null) {
     this.selected = body;
+    if (this.mode === 'constellation')
+      this.constellationView?.setMarker(body ? (body as StarPickable).index ?? null : null);
     this.stage.highlight([body?.id, this.hovered?.id].filter((id): id is string => !!id));
     this.renderPanel();
   }
@@ -339,7 +378,10 @@ export class App {
       down = null;
       if (this.mode === 'landing') return;
       const body = this.stage.pickAt(e.clientX, e.clientY);
-      if (body) this.activate(body);
+      if (body) {
+        this.tour?.stop(false);
+        this.activate(body);
+      }
       else if (this.selected) this.select(null);
     });
     let pending = false;
@@ -461,6 +503,10 @@ export class App {
 
   private renderPanel() {
     if (this.mode === 'landing') return;
+    if (this.tour?.active) {
+      this.panel.hidden = true;
+      return;
+    }
     this.panel.hidden = false;
     const content =
       this.mode === 'constellation'
@@ -521,6 +567,9 @@ export class App {
       ),
       c.stars.length ? filter : null,
       c.languages.length ? chips : null,
+      c.stars.length
+        ? el('button', { type: 'button', class: 'primary', on: { click: () => this.startTour() } }, 'Take the tour ✦')
+        : null,
       el('p', { class: 'hint' }, 'Click a star to inspect it. Double-click to fly in.'),
     ]);
   }

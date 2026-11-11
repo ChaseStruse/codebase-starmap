@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 let glow: THREE.Texture | null = null;
 let disc: THREE.Texture | null = null;
+let ring: THREE.Texture | null = null;
 
 function canvasTexture(size: number, draw: (ctx: CanvasRenderingContext2D, size: number) => void) {
   const canvas = document.createElement('canvas');
@@ -35,4 +36,16 @@ export function discTexture(): THREE.Texture {
     ctx.fill();
   });
   return disc;
+}
+
+/** A thin bright ring, for marking the selected star. */
+export function ringTexture(): THREE.Texture {
+  ring ??= canvasTexture(256, (ctx, size) => {
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2 - 10, 0, Math.PI * 2);
+    ctx.stroke();
+  });
+  return ring;
 }
