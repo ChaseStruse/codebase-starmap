@@ -199,7 +199,7 @@ export class Tour {
 
   /**
    * Look at a constellation from the side and a little above, never straight
-   * down the line to the core, so the user's avatar stays out of the shot.
+   * down the line to the centre of the sky, so other constellations stay out of the shot.
    */
   private viewDirection(cluster: Cluster) {
     const outward = this.view.clusterCenter(cluster).normalize();

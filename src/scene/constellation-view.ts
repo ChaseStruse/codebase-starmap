@@ -1,14 +1,14 @@
 import * as THREE from 'three';
 import type { Cluster, Constellation, StarBody } from '../galaxy/constellation';
 import type { Pickable, View } from './stage';
-import { discTexture, glowTexture, ringTexture } from './textures';
+import { glowTexture, ringTexture } from './textures';
 
 export interface StarPickable extends Pickable {
   star: StarBody;
   index: number;
 }
 
-/** The user's repos as language constellations floating in 3D around their avatar. */
+/** The user's repos as language constellations floating in 3D space. */
 export class ConstellationView implements View {
   readonly root = new THREE.Group();
   private readonly spin = new THREE.Group();
@@ -67,7 +67,6 @@ export class ConstellationView implements View {
 
     for (const cluster of clusters) this.addNebula(cluster);
     this.addLinks();
-    this.addCore();
 
     this.bodies = stars.map((star, index) => ({
       id: star.id,
@@ -250,53 +249,5 @@ export class ConstellationView implements View {
     this.linkMaterial = material;
     this.disposables.push(geometry, material);
     this.spin.add(new THREE.LineSegments(geometry, material));
-  }
-
-  /** A glowing core with the user's avatar at the centre of it all. */
-  private addCore() {
-    const glow = new THREE.Sprite(
-      new THREE.SpriteMaterial({
-        map: glowTexture(),
-        color: '#20d99a',
-        transparent: true,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        opacity: 0.55,
-      }),
-    );
-    glow.scale.setScalar(40);
-    this.disposables.push(glow.material);
-    this.root.add(glow);
-
-    const avatar = new THREE.SpriteMaterial({
-      alphaMap: discTexture(),
-      transparent: true,
-      depthWrite: false,
-      color: '#20d99a',
-      opacity: 0.9,
-    });
-    this.disposables.push(avatar);
-    const sprite = new THREE.Sprite(avatar);
-    sprite.scale.setScalar(12);
-    this.root.add(sprite);
-
-    const loader = new THREE.TextureLoader();
-    loader.setCrossOrigin('anonymous');
-    const url = this.constellation.user.avatar_url;
-    loader.load(
-      `${url}${url.includes('?') ? '&' : '?'}s=256`,
-      (texture) => {
-        texture.colorSpace = THREE.SRGBColorSpace;
-        avatar.map = texture;
-        avatar.color.set('#ffffff');
-        avatar.opacity = 1;
-        avatar.needsUpdate = true;
-        this.disposables.push(texture);
-      },
-      undefined,
-      () => {
-        /* Avatar blocked or offline: keep the plain glowing core. */
-      },
-    );
   }
 }

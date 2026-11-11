@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 
 let glow: THREE.Texture | null = null;
-let disc: THREE.Texture | null = null;
 let ring: THREE.Texture | null = null;
 
 function canvasTexture(size: number, draw: (ctx: CanvasRenderingContext2D, size: number) => void) {
@@ -25,17 +24,6 @@ export function glowTexture(): THREE.Texture {
     ctx.fillRect(0, 0, size, size);
   });
   return glow;
-}
-
-/** A hard-edged circle, used as an alpha mask for the avatar. */
-export function discTexture(): THREE.Texture {
-  disc ??= canvasTexture(256, (ctx, size) => {
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(size / 2, size / 2, size / 2 - 2, 0, Math.PI * 2);
-    ctx.fill();
-  });
-  return disc;
 }
 
 /** A thin bright ring, for marking the selected star. */
