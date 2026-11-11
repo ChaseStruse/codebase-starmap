@@ -1,0 +1,2074 @@
+{
+  "version": 1,
+  "title": "Codebase Starmap: v1 on GitHub Pages",
+  "nodes": [
+    {
+      "id": "h",
+      "kind": "text",
+      "serviceId": "note.text",
+      "label": "Codebase Starmap v1 · chasestruse.github.io/starmap · 100% in the browser, no backend",
+      "x": 150,
+      "z": -720,
+      "width": 1200,
+      "depth": 70,
+      "color": "#ffffff",
+      "fontSize": 34
+    },
+    {
+      "id": "visitor",
+      "kind": "service",
+      "label": "Visitor",
+      "x": -1000,
+      "z": -200,
+      "width": 140,
+      "depth": 100,
+      "color": "#3f8cff",
+      "wrap": true,
+      "serviceId": "actor.user"
+    },
+    {
+      "id": "pages",
+      "kind": "service",
+      "label": "GitHub Pages\n/starmap (static)",
+      "x": -700,
+      "z": -200,
+      "width": 180,
+      "depth": 100,
+      "color": "#5a6b86",
+      "wrap": true,
+      "serviceId": "actor.internet",
+      "metadata": {
+        "notes": "Serves index.html + JS bundle + assets. Vite base: /starmap/"
+      }
+    },
+    {
+      "id": "browser",
+      "kind": "group",
+      "label": "Visitor's browser",
+      "x": 150,
+      "z": 0,
+      "width": 1250,
+      "depth": 1100,
+      "color": "#3178c6"
+    },
+    {
+      "id": "prompt",
+      "kind": "service",
+      "label": "Username prompt\n(+ optional token)",
+      "x": -430,
+      "z": -380,
+      "width": 180,
+      "depth": 100,
+      "color": "#3178c6",
+      "wrap": true,
+      "serviceId": "flow.process",
+      "shape": "process",
+      "parentId": "browser"
+    },
+    {
+      "id": "panels",
+      "kind": "service",
+      "label": "UI panels\nplain TS + HTML",
+      "x": -430,
+      "z": -120,
+      "width": 180,
+      "depth": 100,
+      "color": "#3178c6",
+      "wrap": true,
+      "serviceId": "flow.process",
+      "shape": "process",
+      "parentId": "browser",
+      "metadata": {
+        "notes": "Repo details, search, timeline scrubber, legend, rate-limit meter"
+      }
+    },
+    {
+      "id": "store",
+      "kind": "service",
+      "label": "App store\nplain TS",
+      "x": -130,
+      "z": -250,
+      "width": 180,
+      "depth": 100,
+      "color": "#3178c6",
+      "wrap": true,
+      "serviceId": "flow.process",
+      "shape": "process",
+      "parentId": "browser"
+    },
+    {
+      "id": "client",
+      "kind": "service",
+      "label": "GitHub client\nrate-limit aware",
+      "x": 190,
+      "z": -380,
+      "width": 210,
+      "depth": 100,
+      "color": "#3178c6",
+      "wrap": true,
+      "serviceId": "flow.process",
+      "shape": "process",
+      "parentId": "browser",
+      "detailId": "data",
+      "journeyCaption": "Open for the GitHub data flow"
+    },
+    {
+      "id": "cache",
+      "kind": "service",
+      "label": "IndexedDB cache\nETag revalidation",
+      "x": 460,
+      "z": -380,
+      "width": 180,
+      "depth": 100,
+      "color": "#c925d1",
+      "wrap": true,
+      "serviceId": "flow.process",
+      "shape": "process",
+      "parentId": "browser",
+      "stores": [
+        "m-cache",
+        "m-user",
+        "m-repo",
+        "m-dir",
+        "m-file",
+        "m-activity",
+        "m-import"
+      ]
+    },
+    {
+      "id": "galaxy",
+      "kind": "service",
+      "label": "Galaxy builder\nAPI data → bodies",
+      "x": 190,
+      "z": -120,
+      "width": 180,
+      "depth": 100,
+      "color": "#3178c6",
+      "wrap": true,
+      "serviceId": "flow.process",
+      "shape": "process",
+      "parentId": "browser"
+    },
+    {
+      "id": "layout",
+      "kind": "service",
+      "label": "Seeded layout\n(Web Worker)",
+      "x": 190,
+      "z": 130,
+      "width": 180,
+      "depth": 100,
+      "color": "#3178c6",
+      "wrap": true,
+      "serviceId": "flow.process",
+      "shape": "process",
+      "parentId": "browser",
+      "metadata": {
+        "notes": "Runs off the main thread so flying stays smooth. Same seed → same constellation every visit."
+      }
+    },
+    {
+      "id": "three",
+      "kind": "service",
+      "label": "Three.js renderer\nWebGL",
+      "x": -130,
+      "z": 130,
+      "width": 180,
+      "depth": 100,
+      "color": "#7c3aed",
+      "wrap": true,
+      "serviceId": "flow.process",
+      "shape": "process",
+      "parentId": "browser",
+      "detailId": "frontend",
+      "journeyCaption": "Open for the render loop"
+    },
+    {
+      "id": "gh",
+      "kind": "service",
+      "label": "api.github.com\nREST v3",
+      "x": 950,
+      "z": -380,
+      "width": 180,
+      "depth": 100,
+      "color": "#24292f",
+      "wrap": true,
+      "serviceId": "actor.internet",
+      "metadata": {
+        "notes": "60 req/hr per IP unauthenticated, 5,000 with a token. CORS allowed."
+      }
+    },
+    {
+      "id": "raw",
+      "kind": "service",
+      "label": "raw.githubusercontent.com",
+      "x": 950,
+      "z": -60,
+      "width": 180,
+      "depth": 100,
+      "color": "#24292f",
+      "wrap": true,
+      "serviceId": "actor.internet",
+      "metadata": {
+        "notes": "File contents for on-demand import parsing; does not use the REST quota."
+      }
+    },
+    {
+      "id": "ship",
+      "kind": "group",
+      "label": "Build + deploy",
+      "x": -760,
+      "z": 470,
+      "width": 640,
+      "depth": 260,
+      "color": "#24292f"
+    },
+    {
+      "id": "repo",
+      "kind": "service",
+      "label": "codebase-starmap repo",
+      "x": -160,
+      "z": 0,
+      "width": 180,
+      "depth": 100,
+      "color": "#f05032",
+      "wrap": true,
+      "serviceId": "component.git",
+      "parentId": "ship"
+    },
+    {
+      "id": "ci",
+      "kind": "service",
+      "label": "GitHub Actions\nvite build → Pages",
+      "x": 160,
+      "z": 0,
+      "width": 180,
+      "depth": 100,
+      "color": "#24292f",
+      "wrap": true,
+      "serviceId": "component.github-actions",
+      "parentId": "ship"
+    },
+    {
+      "id": "later",
+      "kind": "service",
+      "label": "Later: deep scan\n(local Rust CLI)",
+      "x": 520,
+      "z": 760,
+      "width": 180,
+      "depth": 100,
+      "color": "#dea584",
+      "wrap": true,
+      "serviceId": "flow.process",
+      "shape": "process",
+      "detailId": "deep",
+      "journeyCaption": "The original local design, kept for later"
+    },
+    {
+      "id": "aws",
+      "kind": "service",
+      "label": "Later: AWS",
+      "x": 850,
+      "z": 760,
+      "width": 180,
+      "depth": 100,
+      "color": "#00a4a6",
+      "wrap": true,
+      "serviceId": "aws.cloudfront",
+      "detailId": "aws",
+      "journeyCaption": "When rate limits become the bottleneck"
+    },
+    {
+      "id": "metaphor",
+      "kind": "note",
+      "serviceId": "note.sticky",
+      "label": "The metaphor\n• Constellation = GitHub user\n• Star system = repo\n   (colour = language, size = repo size,\n    brightness = last push, glow = stars)\n• Planet = directory · Moon = file\n• Flares = weekly commit activity\n• Trade lane = import (on demand)",
+      "x": -1000,
+      "z": 260,
+      "width": 400,
+      "depth": 280,
+      "color": "#ffe29a",
+      "fontSize": 18
+    },
+    {
+      "id": "budget",
+      "kind": "note",
+      "serviceId": "note.sticky",
+      "label": "Request budget (60/hr, no token)\n• Constellation: 2 calls\n• Fly into a repo: 1 tree + 1 activity\n• → ~25 repo dives per hour\n• Cached repeats (< 1 hr): 0 calls\n• With a token: 5,000/hr + free ETag 304s",
+      "x": 950,
+      "z": 330,
+      "width": 380,
+      "depth": 200,
+      "color": "#ffe29a",
+      "fontSize": 18
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "visitor",
+      "target": "pages",
+      "label": "GET /starmap"
+    },
+    {
+      "id": "e2",
+      "source": "pages",
+      "target": "prompt",
+      "label": "static bundle"
+    },
+    {
+      "id": "e3",
+      "source": "prompt",
+      "target": "store",
+      "label": "login (+ token)"
+    },
+    {
+      "id": "e4",
+      "source": "store",
+      "target": "client",
+      "label": "load user / repo"
+    },
+    {
+      "id": "e5",
+      "source": "client",
+      "target": "cache",
+      "label": "lookup + store",
+      "carries": [
+        "m-cache"
+      ]
+    },
+    {
+      "id": "e6",
+      "source": "client",
+      "target": "gh",
+      "label": "fetch (If-None-Match)",
+      "carries": [
+        "m-user",
+        "m-repo",
+        "m-file",
+        "m-activity"
+      ]
+    },
+    {
+      "id": "e7",
+      "source": "client",
+      "target": "raw",
+      "label": "file contents (on demand)",
+      "carries": [
+        "m-import"
+      ]
+    },
+    {
+      "id": "e8",
+      "source": "client",
+      "target": "galaxy",
+      "label": "API responses",
+      "carries": [
+        "m-user",
+        "m-repo",
+        "m-dir",
+        "m-file",
+        "m-activity"
+      ]
+    },
+    {
+      "id": "e9",
+      "source": "galaxy",
+      "target": "layout",
+      "label": "bodies"
+    },
+    {
+      "id": "e10",
+      "source": "layout",
+      "target": "three",
+      "label": "positions"
+    },
+    {
+      "id": "e11",
+      "source": "three",
+      "target": "panels",
+      "label": "picked body"
+    },
+    {
+      "id": "e12",
+      "source": "panels",
+      "target": "store",
+      "label": "select / search / scrub"
+    },
+    {
+      "id": "e13",
+      "source": "repo",
+      "target": "ci",
+      "label": "push to main"
+    },
+    {
+      "id": "e14",
+      "source": "ci",
+      "target": "pages",
+      "label": "deploy dist/"
+    }
+  ],
+  "models": [
+    {
+      "id": "m-user",
+      "name": "GitHubUser",
+      "description": "The constellation. From GET /users/:login.",
+      "fields": [
+        {
+          "id": "u-login",
+          "name": "login",
+          "type": "text",
+          "primaryKey": true,
+          "required": true,
+          "dbType": "text"
+        },
+        {
+          "id": "u-name",
+          "name": "name",
+          "type": "text",
+          "dbType": "text"
+        },
+        {
+          "id": "u-avatar",
+          "name": "avatar_url",
+          "type": "text",
+          "dbType": "text",
+          "description": "Shown at the centre of the constellation"
+        },
+        {
+          "id": "u-repos",
+          "name": "public_repos",
+          "type": "number",
+          "dbType": "integer"
+        },
+        {
+          "id": "u-created",
+          "name": "created_at",
+          "type": "date",
+          "dbType": "timestamp"
+        }
+      ]
+    },
+    {
+      "id": "m-repo",
+      "name": "Repo",
+      "description": "A star system. From GET /users/:login/repos (one call, up to 100 repos).",
+      "fields": [
+        {
+          "id": "r-full",
+          "name": "full_name",
+          "type": "text",
+          "primaryKey": true,
+          "required": true,
+          "dbType": "text"
+        },
+        {
+          "id": "r-owner",
+          "name": "owner_login",
+          "type": "text",
+          "required": true,
+          "dbType": "text",
+          "references": {
+            "modelId": "m-user"
+          }
+        },
+        {
+          "id": "r-lang",
+          "name": "language",
+          "type": "text",
+          "dbType": "text",
+          "description": "Star colour"
+        },
+        {
+          "id": "r-size",
+          "name": "size_kb",
+          "type": "number",
+          "dbType": "integer",
+          "description": "Star size"
+        },
+        {
+          "id": "r-stars",
+          "name": "stargazers_count",
+          "type": "number",
+          "dbType": "integer",
+          "description": "Glow"
+        },
+        {
+          "id": "r-pushed",
+          "name": "pushed_at",
+          "type": "date",
+          "dbType": "timestamp",
+          "description": "Brightness: recent = bright"
+        },
+        {
+          "id": "r-branch",
+          "name": "default_branch",
+          "type": "text",
+          "dbType": "text"
+        },
+        {
+          "id": "r-fork",
+          "name": "fork",
+          "type": "boolean",
+          "dbType": "boolean",
+          "description": "Forks drawn as faint companion stars"
+        }
+      ]
+    },
+    {
+      "id": "m-dir",
+      "name": "Directory",
+      "description": "A planet. Built from the recursive git tree.",
+      "fields": [
+        {
+          "id": "d-id",
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "required": true,
+          "dbType": "text"
+        },
+        {
+          "id": "d-repo",
+          "name": "repo",
+          "type": "text",
+          "required": true,
+          "dbType": "text",
+          "references": {
+            "modelId": "m-repo"
+          }
+        },
+        {
+          "id": "d-path",
+          "name": "path",
+          "type": "text",
+          "required": true,
+          "dbType": "text",
+          "example": "src/renderer"
+        },
+        {
+          "id": "d-parent",
+          "name": "parent_id",
+          "type": "text",
+          "dbType": "text",
+          "references": {
+            "modelId": "m-dir"
+          },
+          "description": "Sub-directories orbit their parent"
+        },
+        {
+          "id": "d-bytes",
+          "name": "total_bytes",
+          "type": "number",
+          "dbType": "integer",
+          "description": "Planet size"
+        },
+        {
+          "id": "d-lang",
+          "name": "dominant_language",
+          "type": "text",
+          "dbType": "text",
+          "description": "Guessed from file extensions"
+        }
+      ]
+    },
+    {
+      "id": "m-file",
+      "name": "FileEntry",
+      "description": "A moon. A blob from GET /repos/:o/:r/git/trees/:branch?recursive=1.",
+      "fields": [
+        {
+          "id": "f-sha",
+          "name": "sha",
+          "type": "text",
+          "primaryKey": true,
+          "required": true,
+          "dbType": "text"
+        },
+        {
+          "id": "f-dir",
+          "name": "directory_id",
+          "type": "text",
+          "required": true,
+          "dbType": "text",
+          "references": {
+            "modelId": "m-dir"
+          }
+        },
+        {
+          "id": "f-path",
+          "name": "path",
+          "type": "text",
+          "required": true,
+          "dbType": "text"
+        },
+        {
+          "id": "f-size",
+          "name": "size",
+          "type": "number",
+          "dbType": "integer"
+        },
+        {
+          "id": "f-ext",
+          "name": "extension",
+          "type": "text",
+          "dbType": "text"
+        }
+      ]
+    },
+    {
+      "id": "m-activity",
+      "name": "WeeklyActivity",
+      "description": "Flares + timeline. From GET /repos/:o/:r/stats/commit_activity (52 weeks).",
+      "fields": [
+        {
+          "id": "a-id",
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "required": true,
+          "dbType": "text"
+        },
+        {
+          "id": "a-repo",
+          "name": "repo",
+          "type": "text",
+          "required": true,
+          "dbType": "text",
+          "references": {
+            "modelId": "m-repo"
+          }
+        },
+        {
+          "id": "a-week",
+          "name": "week",
+          "type": "date",
+          "required": true,
+          "dbType": "timestamp"
+        },
+        {
+          "id": "a-total",
+          "name": "commits",
+          "type": "number",
+          "dbType": "integer"
+        }
+      ]
+    },
+    {
+      "id": "m-import",
+      "name": "ImportEdge",
+      "description": "A trade lane. On demand only: parsed from raw file contents when you click a planet.",
+      "fields": [
+        {
+          "id": "i-id",
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "required": true,
+          "dbType": "text"
+        },
+        {
+          "id": "i-from",
+          "name": "from_directory",
+          "type": "text",
+          "required": true,
+          "dbType": "text",
+          "references": {
+            "modelId": "m-dir"
+          }
+        },
+        {
+          "id": "i-to",
+          "name": "to_directory",
+          "type": "text",
+          "required": true,
+          "dbType": "text",
+          "references": {
+            "modelId": "m-dir"
+          }
+        },
+        {
+          "id": "i-count",
+          "name": "import_count",
+          "type": "number",
+          "dbType": "integer"
+        }
+      ]
+    },
+    {
+      "id": "m-cache",
+      "name": "CacheEntry",
+      "description": "One cached GitHub response in IndexedDB. Fresh entries (< 1 hr) skip the network entirely; with a token, ETag 304s are also free.",
+      "fields": [
+        {
+          "id": "c-url",
+          "name": "url",
+          "type": "text",
+          "primaryKey": true,
+          "required": true,
+          "dbType": "text"
+        },
+        {
+          "id": "c-etag",
+          "name": "etag",
+          "type": "text",
+          "dbType": "text"
+        },
+        {
+          "id": "c-fetched",
+          "name": "fetched_at",
+          "type": "date",
+          "required": true,
+          "dbType": "timestamp"
+        },
+        {
+          "id": "c-body",
+          "name": "body",
+          "type": "text",
+          "dbType": "json"
+        },
+        {
+          "id": "c-token",
+          "name": "token",
+          "type": "text",
+          "sensitivity": "secret",
+          "dbType": "text",
+          "description": "Optional PAT, stored ONLY in this browser, never sent anywhere but api.github.com"
+        }
+      ]
+    }
+  ],
+  "details": [
+    {
+      "id": "data",
+      "document": {
+        "version": 1,
+        "title": "GitHub Data Flow + Rate Limits",
+        "nodes": [
+          {
+            "id": "h",
+            "kind": "text",
+            "serviceId": "note.text",
+            "label": "GitHub client · every request goes through the cache first",
+            "x": 500,
+            "z": -620,
+            "width": 1200,
+            "depth": 70,
+            "color": "#ffffff",
+            "fontSize": 34
+          },
+          {
+            "id": "start",
+            "kind": "service",
+            "label": "Visitor enters\nusername",
+            "x": -700,
+            "z": -380,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.terminal",
+            "shape": "terminal",
+            "owner": "Visitor"
+          },
+          {
+            "id": "fresh",
+            "kind": "service",
+            "label": "Cached and\n< 1 hour old?",
+            "x": -400,
+            "z": -380,
+            "width": 200,
+            "depth": 130,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.decision",
+            "shape": "decision",
+            "owner": "Cache",
+            "journey": {
+              "mode": "ask"
+            }
+          },
+          {
+            "id": "use",
+            "kind": "service",
+            "label": "Use cached body\n(0 requests)",
+            "x": -400,
+            "z": -620,
+            "width": 180,
+            "depth": 100,
+            "color": "#c925d1",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "owner": "Cache"
+          },
+          {
+            "id": "budget",
+            "kind": "service",
+            "label": "Rate limit\nremaining > 5?",
+            "x": -80,
+            "z": -380,
+            "width": 200,
+            "depth": 130,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.decision",
+            "shape": "decision",
+            "owner": "GitHub client",
+            "journey": {
+              "mode": "ask"
+            }
+          },
+          {
+            "id": "askTok",
+            "kind": "service",
+            "label": "Show meter + offer\n\"add a token\"",
+            "x": -80,
+            "z": -620,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "owner": "GitHub client",
+            "metadata": {
+              "notes": "Read X-RateLimit-Remaining / X-RateLimit-Reset from every response"
+            }
+          },
+          {
+            "id": "user",
+            "kind": "service",
+            "label": "GET /users/:login",
+            "x": 240,
+            "z": -380,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "owner": "GitHub API"
+          },
+          {
+            "id": "repos",
+            "kind": "service",
+            "label": "GET /users/:login/repos\n?per_page=100&sort=pushed",
+            "x": 520,
+            "z": -380,
+            "width": 230,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "owner": "GitHub API"
+          },
+          {
+            "id": "constel",
+            "kind": "service",
+            "label": "Build constellation\nrepos → star systems",
+            "x": 820,
+            "z": -380,
+            "width": 180,
+            "depth": 100,
+            "color": "#3178c6",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "owner": "Galaxy builder"
+          },
+          {
+            "id": "click",
+            "kind": "service",
+            "label": "Visitor flies\ninto a repo",
+            "x": -700,
+            "z": 0,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.terminal",
+            "shape": "terminal",
+            "owner": "Visitor"
+          },
+          {
+            "id": "tree",
+            "kind": "service",
+            "label": "GET /repos/:o/:r/git/trees\n/:branch?recursive=1",
+            "x": 240,
+            "z": 0,
+            "width": 240,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "owner": "GitHub API",
+            "metadata": {
+              "notes": "One call returns the whole file list with sizes. Very large repos come back truncated: render what we get and say so."
+            }
+          },
+          {
+            "id": "acts",
+            "kind": "service",
+            "label": "GET /repos/:o/:r/stats\n/commit_activity",
+            "x": 520,
+            "z": 0,
+            "width": 230,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "owner": "GitHub API"
+          },
+          {
+            "id": "accepted",
+            "kind": "service",
+            "label": "202 Accepted?\n(stats computing)",
+            "x": 520,
+            "z": 260,
+            "width": 210,
+            "depth": 130,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.decision",
+            "shape": "decision",
+            "owner": "GitHub client"
+          },
+          {
+            "id": "retry",
+            "kind": "service",
+            "label": "Retry after 2s\n(max 3)",
+            "x": 240,
+            "z": 260,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "owner": "GitHub client"
+          },
+          {
+            "id": "system",
+            "kind": "service",
+            "label": "Build star system\ndirs → planets, files → moons",
+            "x": 820,
+            "z": 0,
+            "width": 240,
+            "depth": 100,
+            "color": "#3178c6",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "owner": "Galaxy builder"
+          },
+          {
+            "id": "flares",
+            "kind": "service",
+            "label": "Attach weekly\nactivity → flares",
+            "x": 820,
+            "z": 260,
+            "width": 180,
+            "depth": 100,
+            "color": "#3178c6",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "owner": "Galaxy builder"
+          },
+          {
+            "id": "planet",
+            "kind": "service",
+            "label": "Visitor clicks\na planet",
+            "x": -700,
+            "z": 520,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.terminal",
+            "shape": "terminal",
+            "owner": "Visitor"
+          },
+          {
+            "id": "rawf",
+            "kind": "service",
+            "label": "Fetch files from\nraw.githubusercontent",
+            "x": 240,
+            "z": 520,
+            "width": 220,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "owner": "GitHub API"
+          },
+          {
+            "id": "parse",
+            "kind": "service",
+            "label": "Regex import scan\n(TS/JS, Py, Rust, Go)",
+            "x": 520,
+            "z": 520,
+            "width": 180,
+            "depth": 100,
+            "color": "#3178c6",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "owner": "Galaxy builder",
+            "metadata": {
+              "notes": "v1 uses lightweight regexes. tree-sitter WASM is the upgrade path."
+            }
+          },
+          {
+            "id": "lanes",
+            "kind": "service",
+            "label": "Draw trade lanes",
+            "x": 820,
+            "z": 520,
+            "width": 180,
+            "depth": 100,
+            "color": "#3178c6",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "owner": "Galaxy builder"
+          },
+          {
+            "id": "df-note",
+            "kind": "note",
+            "serviceId": "note.sticky",
+            "label": "Privacy\n• Public data only (no login needed)\n• Optional token lives in this browser only\n• No analytics on usernames searched",
+            "x": -720,
+            "z": 300,
+            "width": 360,
+            "depth": 150,
+            "color": "#ffe29a",
+            "fontSize": 18
+          }
+        ],
+        "edges": [
+          {
+            "id": "d1",
+            "source": "start",
+            "target": "fresh",
+            "label": ""
+          },
+          {
+            "id": "d2",
+            "source": "fresh",
+            "target": "use",
+            "label": "yes"
+          },
+          {
+            "id": "d3",
+            "source": "fresh",
+            "target": "budget",
+            "label": "no"
+          },
+          {
+            "id": "d4",
+            "source": "budget",
+            "target": "askTok",
+            "label": "no"
+          },
+          {
+            "id": "d5",
+            "source": "budget",
+            "target": "user",
+            "label": "yes"
+          },
+          {
+            "id": "d6",
+            "source": "user",
+            "target": "repos",
+            "label": "",
+            "carries": [
+              "m-user"
+            ]
+          },
+          {
+            "id": "d7",
+            "source": "repos",
+            "target": "constel",
+            "label": "",
+            "carries": [
+              "m-repo"
+            ]
+          },
+          {
+            "id": "d8",
+            "source": "click",
+            "target": "tree",
+            "label": "via cache + budget check"
+          },
+          {
+            "id": "d9",
+            "source": "tree",
+            "target": "system",
+            "label": "",
+            "carries": [
+              "m-dir",
+              "m-file"
+            ]
+          },
+          {
+            "id": "d10",
+            "source": "click",
+            "target": "acts",
+            "label": "in parallel"
+          },
+          {
+            "id": "d11",
+            "source": "acts",
+            "target": "accepted",
+            "label": ""
+          },
+          {
+            "id": "d12",
+            "source": "accepted",
+            "target": "retry",
+            "label": "yes"
+          },
+          {
+            "id": "d13",
+            "source": "retry",
+            "target": "acts",
+            "label": ""
+          },
+          {
+            "id": "d14",
+            "source": "accepted",
+            "target": "flares",
+            "label": "no",
+            "carries": [
+              "m-activity"
+            ]
+          },
+          {
+            "id": "d15",
+            "source": "planet",
+            "target": "rawf",
+            "label": "small dirs only (≤ 50 files)"
+          },
+          {
+            "id": "d16",
+            "source": "rawf",
+            "target": "parse",
+            "label": ""
+          },
+          {
+            "id": "d17",
+            "source": "parse",
+            "target": "lanes",
+            "label": "",
+            "carries": [
+              "m-import"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "frontend",
+      "document": {
+        "version": 1,
+        "title": "Frontend: Two Zoom Levels → Render Loop",
+        "nodes": [
+          {
+            "id": "h",
+            "kind": "text",
+            "serviceId": "note.text",
+            "label": "Frontend · Vite + TypeScript + Three.js (no framework)",
+            "x": 300,
+            "z": -600,
+            "width": 1200,
+            "depth": 70,
+            "color": "#ffffff",
+            "fontSize": 34
+          },
+          {
+            "id": "store",
+            "kind": "service",
+            "label": "App store\nview = constellation | system",
+            "x": -620,
+            "z": -320,
+            "width": 220,
+            "depth": 100,
+            "color": "#3178c6",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          },
+          {
+            "id": "builder",
+            "kind": "service",
+            "label": "Scene builder\nbodies → meshes",
+            "x": -300,
+            "z": -320,
+            "width": 180,
+            "depth": 100,
+            "color": "#7c3aed",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          },
+          {
+            "id": "scene",
+            "kind": "group",
+            "label": "Three.js scene",
+            "x": 260,
+            "z": -60,
+            "width": 640,
+            "depth": 560,
+            "color": "#7c3aed"
+          },
+          {
+            "id": "stars",
+            "kind": "service",
+            "label": "Stars (repos)\nInstancedMesh + bloom",
+            "x": -150,
+            "z": -180,
+            "width": 180,
+            "depth": 100,
+            "color": "#7c3aed",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "parentId": "scene"
+          },
+          {
+            "id": "planets",
+            "kind": "service",
+            "label": "Planets + moons\nInstancedMesh",
+            "x": 150,
+            "z": -180,
+            "width": 180,
+            "depth": 100,
+            "color": "#7c3aed",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "parentId": "scene"
+          },
+          {
+            "id": "flares",
+            "kind": "service",
+            "label": "Flares\ncustom shader",
+            "x": -150,
+            "z": 60,
+            "width": 180,
+            "depth": 100,
+            "color": "#7c3aed",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "parentId": "scene"
+          },
+          {
+            "id": "lanes",
+            "kind": "service",
+            "label": "Trade lanes\nLineSegments2",
+            "x": 150,
+            "z": 60,
+            "width": 180,
+            "depth": 100,
+            "color": "#7c3aed",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "parentId": "scene"
+          },
+          {
+            "id": "fly",
+            "kind": "service",
+            "label": "Fly-to transition\ncamera tween",
+            "x": -620,
+            "z": 380,
+            "width": 180,
+            "depth": 100,
+            "color": "#7c3aed",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "metadata": {
+              "notes": "Constellation → system: tween camera into the star, fade other stars, then fetch + build the system."
+            }
+          },
+          {
+            "id": "controls",
+            "kind": "service",
+            "label": "Camera controls\norbit / fly",
+            "x": -300,
+            "z": 380,
+            "width": 180,
+            "depth": 100,
+            "color": "#7c3aed",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          },
+          {
+            "id": "pick",
+            "kind": "service",
+            "label": "Raycast picking\nhover + click",
+            "x": 0,
+            "z": 380,
+            "width": 180,
+            "depth": 100,
+            "color": "#7c3aed",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          },
+          {
+            "id": "loop",
+            "kind": "service",
+            "label": "requestAnimationFrame\nloop + LOD",
+            "x": 320,
+            "z": 380,
+            "width": 180,
+            "depth": 100,
+            "color": "#7c3aed",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          },
+          {
+            "id": "panels",
+            "kind": "group",
+            "label": "UI panels (HTML overlay)",
+            "x": 820,
+            "z": 130,
+            "width": 300,
+            "depth": 760,
+            "color": "#3178c6"
+          },
+          {
+            "id": "p-detail",
+            "kind": "service",
+            "label": "Repo / body details",
+            "x": 0,
+            "z": -270,
+            "width": 230,
+            "depth": 90,
+            "color": "#3178c6",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "parentId": "panels"
+          },
+          {
+            "id": "p-search",
+            "kind": "service",
+            "label": "Search / filter",
+            "x": 0,
+            "z": -130,
+            "width": 230,
+            "depth": 90,
+            "color": "#3178c6",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "parentId": "panels"
+          },
+          {
+            "id": "p-time",
+            "kind": "service",
+            "label": "Timeline (52 weeks)",
+            "x": 0,
+            "z": 10,
+            "width": 230,
+            "depth": 90,
+            "color": "#3178c6",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "parentId": "panels"
+          },
+          {
+            "id": "p-rate",
+            "kind": "service",
+            "label": "Rate-limit meter",
+            "x": 0,
+            "z": 150,
+            "width": 230,
+            "depth": 90,
+            "color": "#3178c6",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "parentId": "panels"
+          },
+          {
+            "id": "p-legend",
+            "kind": "service",
+            "label": "Legend",
+            "x": 0,
+            "z": 290,
+            "width": 230,
+            "depth": 90,
+            "color": "#3178c6",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "parentId": "panels"
+          }
+        ],
+        "edges": [
+          {
+            "id": "f1",
+            "source": "store",
+            "target": "builder",
+            "label": "on view / data change",
+            "carries": [
+              "m-user",
+              "m-repo",
+              "m-dir",
+              "m-file",
+              "m-activity"
+            ]
+          },
+          {
+            "id": "f2",
+            "source": "builder",
+            "target": "stars",
+            "label": "constellation"
+          },
+          {
+            "id": "f3",
+            "source": "builder",
+            "target": "planets",
+            "label": "system"
+          },
+          {
+            "id": "f4",
+            "source": "builder",
+            "target": "flares",
+            "label": ""
+          },
+          {
+            "id": "f5",
+            "source": "builder",
+            "target": "lanes",
+            "label": "on demand"
+          },
+          {
+            "id": "f6",
+            "source": "pick",
+            "target": "fly",
+            "label": "click a star"
+          },
+          {
+            "id": "f7",
+            "source": "fly",
+            "target": "store",
+            "label": "view = system"
+          },
+          {
+            "id": "f8",
+            "source": "controls",
+            "target": "loop",
+            "label": "camera"
+          },
+          {
+            "id": "f9",
+            "source": "pick",
+            "target": "p-detail",
+            "label": "selection"
+          },
+          {
+            "id": "f10",
+            "source": "p-time",
+            "target": "flares",
+            "label": "week → intensity"
+          },
+          {
+            "id": "f11",
+            "source": "p-search",
+            "target": "store",
+            "label": "filters"
+          }
+        ]
+      }
+    },
+    {
+      "id": "deep",
+      "document": {
+        "version": 1,
+        "title": "Later: Deep Scan (local Rust CLI)",
+        "nodes": [
+          {
+            "id": "h",
+            "kind": "text",
+            "serviceId": "note.text",
+            "label": "Later · full import graphs + git churn for private/local repos",
+            "x": 0,
+            "z": -560,
+            "width": 1200,
+            "depth": 70,
+            "color": "#ffffff",
+            "fontSize": 34
+          },
+          {
+            "id": "dev",
+            "kind": "service",
+            "label": "Developer",
+            "x": -800,
+            "z": -100,
+            "width": 140,
+            "depth": 100,
+            "color": "#3f8cff",
+            "wrap": true,
+            "serviceId": "actor.user"
+          },
+          {
+            "id": "lrepo",
+            "kind": "service",
+            "label": "Local git repo",
+            "x": -500,
+            "z": 300,
+            "width": 180,
+            "depth": 100,
+            "color": "#f05032",
+            "wrap": true,
+            "serviceId": "component.git"
+          },
+          {
+            "id": "bin",
+            "kind": "group",
+            "label": "starmap (Rust binary)",
+            "x": -60,
+            "z": -60,
+            "width": 620,
+            "depth": 600,
+            "color": "#dea584"
+          },
+          {
+            "id": "cli",
+            "kind": "service",
+            "label": "CLI (clap)",
+            "x": -150,
+            "z": -170,
+            "width": 180,
+            "depth": 100,
+            "color": "#dea584",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "parentId": "bin"
+          },
+          {
+            "id": "server",
+            "kind": "service",
+            "label": "Axum server\nREST + WS",
+            "x": 150,
+            "z": -170,
+            "width": 180,
+            "depth": 100,
+            "color": "#dea584",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "parentId": "bin"
+          },
+          {
+            "id": "core",
+            "kind": "service",
+            "label": "starmap-core\ntree-sitter + gix",
+            "x": 0,
+            "z": 40,
+            "width": 220,
+            "depth": 100,
+            "color": "#dea584",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "parentId": "bin",
+            "detailId": "analyzer"
+          },
+          {
+            "id": "db",
+            "kind": "service",
+            "label": "SQLite snapshots",
+            "x": 0,
+            "z": 230,
+            "width": 180,
+            "depth": 100,
+            "color": "#c925d1",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process",
+            "parentId": "bin"
+          },
+          {
+            "id": "fe",
+            "kind": "service",
+            "label": "Same Vite frontend\n(local data source)",
+            "x": 600,
+            "z": -170,
+            "width": 210,
+            "depth": 100,
+            "color": "#3178c6",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          },
+          {
+            "id": "deep-note",
+            "kind": "note",
+            "serviceId": "note.sticky",
+            "label": "Why keep this\n• Private repos, no token needed\n• Real import graphs + cycles\n• Bug-fix hotspots from full history\n• Frontend swaps data source only",
+            "x": -800,
+            "z": 380,
+            "width": 360,
+            "depth": 170,
+            "color": "#ffe29a",
+            "fontSize": 18
+          }
+        ],
+        "edges": [
+          {
+            "id": "k1",
+            "source": "dev",
+            "target": "cli",
+            "label": "starmap serve ./repo"
+          },
+          {
+            "id": "k2",
+            "source": "cli",
+            "target": "core",
+            "label": ""
+          },
+          {
+            "id": "k3",
+            "source": "server",
+            "target": "core",
+            "label": "analyze"
+          },
+          {
+            "id": "k4",
+            "source": "core",
+            "target": "lrepo",
+            "label": "files + history"
+          },
+          {
+            "id": "k5",
+            "source": "core",
+            "target": "db",
+            "label": "snapshot"
+          },
+          {
+            "id": "k6",
+            "source": "server",
+            "target": "db",
+            "label": "query"
+          },
+          {
+            "id": "k7",
+            "source": "fe",
+            "target": "server",
+            "label": "localhost API"
+          }
+        ]
+      }
+    },
+    {
+      "id": "analyzer",
+      "document": {
+        "version": 1,
+        "title": "starmap-core: Analyzer Pipeline",
+        "nodes": [
+          {
+            "id": "h",
+            "kind": "text",
+            "serviceId": "note.text",
+            "label": "starmap-core · parse → graph → layout → snapshot",
+            "x": 400,
+            "z": -460,
+            "width": 1200,
+            "depth": 70,
+            "color": "#ffffff",
+            "fontSize": 34
+          },
+          {
+            "id": "start",
+            "kind": "service",
+            "label": "analyze(repo, sha)",
+            "x": -600,
+            "z": -200,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.terminal",
+            "shape": "terminal"
+          },
+          {
+            "id": "scan",
+            "kind": "service",
+            "label": "Walk worktree\n(.gitignore aware)",
+            "x": -300,
+            "z": -200,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          },
+          {
+            "id": "parse",
+            "kind": "service",
+            "label": "tree-sitter parse\n(rayon)",
+            "x": 0,
+            "z": -200,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          },
+          {
+            "id": "imports",
+            "kind": "service",
+            "label": "Extract imports",
+            "x": 300,
+            "z": -200,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          },
+          {
+            "id": "walk",
+            "kind": "service",
+            "label": "Walk commits (gix)",
+            "x": -300,
+            "z": 60,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          },
+          {
+            "id": "churn",
+            "kind": "service",
+            "label": "Churn + bug-fix\nheuristics",
+            "x": 0,
+            "z": 60,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          },
+          {
+            "id": "build",
+            "kind": "service",
+            "label": "Module graph\n(petgraph)",
+            "x": 600,
+            "z": -60,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          },
+          {
+            "id": "layout",
+            "kind": "service",
+            "label": "Seeded orbital layout",
+            "x": 600,
+            "z": 200,
+            "width": 180,
+            "depth": 100,
+            "color": "#d9b677",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          },
+          {
+            "id": "write",
+            "kind": "service",
+            "label": "Write snapshot",
+            "x": 300,
+            "z": 200,
+            "width": 180,
+            "depth": 100,
+            "color": "#c925d1",
+            "wrap": true,
+            "serviceId": "flow.process",
+            "shape": "process"
+          }
+        ],
+        "edges": [
+          {
+            "id": "a1",
+            "source": "start",
+            "target": "scan",
+            "label": ""
+          },
+          {
+            "id": "a2",
+            "source": "start",
+            "target": "walk",
+            "label": "parallel"
+          },
+          {
+            "id": "a3",
+            "source": "scan",
+            "target": "parse",
+            "label": ""
+          },
+          {
+            "id": "a4",
+            "source": "parse",
+            "target": "imports",
+            "label": ""
+          },
+          {
+            "id": "a5",
+            "source": "imports",
+            "target": "build",
+            "label": ""
+          },
+          {
+            "id": "a6",
+            "source": "walk",
+            "target": "churn",
+            "label": ""
+          },
+          {
+            "id": "a7",
+            "source": "churn",
+            "target": "build",
+            "label": ""
+          },
+          {
+            "id": "a8",
+            "source": "build",
+            "target": "layout",
+            "label": ""
+          },
+          {
+            "id": "a9",
+            "source": "layout",
+            "target": "write",
+            "label": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "aws",
+      "document": {
+        "version": 1,
+        "title": "Later: AWS (when rate limits bite)",
+        "nodes": [
+          {
+            "id": "h",
+            "kind": "text",
+            "serviceId": "note.text",
+            "label": "Later · a caching proxy in front of GitHub, plus hosted deep scans",
+            "x": 200,
+            "z": -580,
+            "width": 1200,
+            "depth": 70,
+            "color": "#ffffff",
+            "fontSize": 34
+          },
+          {
+            "id": "user",
+            "kind": "service",
+            "label": "Visitor",
+            "x": -760,
+            "z": 0,
+            "width": 180,
+            "depth": 100,
+            "color": "#3f8cff",
+            "wrap": true,
+            "serviceId": "actor.user"
+          },
+          {
+            "id": "pages",
+            "kind": "service",
+            "label": "Same static frontend\n(Pages or CloudFront)",
+            "x": -440,
+            "z": 0,
+            "width": 210,
+            "depth": 100,
+            "color": "#8c4fff",
+            "wrap": true,
+            "serviceId": "aws.cloudfront"
+          },
+          {
+            "id": "apigw",
+            "kind": "service",
+            "label": "API Gateway",
+            "x": -120,
+            "z": 0,
+            "width": 180,
+            "depth": 100,
+            "color": "#8c4fff",
+            "wrap": true,
+            "serviceId": "aws.api-gateway"
+          },
+          {
+            "id": "proxy",
+            "kind": "service",
+            "label": "Proxy Lambda (Rust)\nGitHub App token",
+            "x": 200,
+            "z": 0,
+            "width": 210,
+            "depth": 100,
+            "color": "#ed7100",
+            "wrap": true,
+            "serviceId": "aws.lambda",
+            "metadata": {
+              "notes": "One shared GitHub App token = 5,000+ req/hr for everyone, and responses are shared between visitors."
+            }
+          },
+          {
+            "id": "ddb",
+            "kind": "service",
+            "label": "DynamoDB\nresponse cache (TTL)",
+            "x": 200,
+            "z": 280,
+            "width": 180,
+            "depth": 100,
+            "color": "#c925d1",
+            "wrap": true,
+            "serviceId": "aws.dynamodb",
+            "stores": [
+              "m-cache"
+            ]
+          },
+          {
+            "id": "gh",
+            "kind": "service",
+            "label": "api.github.com",
+            "x": 540,
+            "z": 0,
+            "width": 180,
+            "depth": 100,
+            "color": "#24292f",
+            "wrap": true,
+            "serviceId": "actor.internet"
+          },
+          {
+            "id": "sqs",
+            "kind": "service",
+            "label": "SQS deep-scan jobs",
+            "x": 200,
+            "z": -300,
+            "width": 180,
+            "depth": 100,
+            "color": "#e7157b",
+            "wrap": true,
+            "serviceId": "aws.sqs"
+          },
+          {
+            "id": "fargate",
+            "kind": "service",
+            "label": "starmap-core\non Fargate",
+            "x": 540,
+            "z": -300,
+            "width": 180,
+            "depth": 100,
+            "color": "#ed7100",
+            "wrap": true,
+            "serviceId": "aws.fargate"
+          },
+          {
+            "id": "s3",
+            "kind": "service",
+            "label": "S3 snapshots",
+            "x": 860,
+            "z": -300,
+            "width": 180,
+            "depth": 100,
+            "color": "#7aa116",
+            "wrap": true,
+            "serviceId": "aws.s3"
+          },
+          {
+            "id": "aws-note",
+            "kind": "note",
+            "serviceId": "note.sticky",
+            "label": "Trigger to build this\nVisitors regularly hitting the\n60/hr limit = proof of value.\nFrontend only changes its base URL.",
+            "x": -760,
+            "z": 320,
+            "width": 360,
+            "depth": 150,
+            "color": "#ffe29a",
+            "fontSize": 18
+          }
+        ],
+        "edges": [
+          {
+            "id": "w1",
+            "source": "user",
+            "target": "pages",
+            "label": "https"
+          },
+          {
+            "id": "w2",
+            "source": "pages",
+            "target": "apigw",
+            "label": "/api/*"
+          },
+          {
+            "id": "w3",
+            "source": "apigw",
+            "target": "proxy",
+            "label": ""
+          },
+          {
+            "id": "w4",
+            "source": "proxy",
+            "target": "ddb",
+            "label": "cache hit?",
+            "carries": [
+              "m-cache"
+            ]
+          },
+          {
+            "id": "w5",
+            "source": "proxy",
+            "target": "gh",
+            "label": "miss → fetch"
+          },
+          {
+            "id": "w6",
+            "source": "proxy",
+            "target": "sqs",
+            "label": "request deep scan"
+          },
+          {
+            "id": "w7",
+            "source": "sqs",
+            "target": "fargate",
+            "label": ""
+          },
+          {
+            "id": "w8",
+            "source": "fargate",
+            "target": "s3",
+            "label": "snapshot"
+          }
+        ]
+      }
+    }
+  ]
+}
